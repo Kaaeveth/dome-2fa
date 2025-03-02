@@ -24,6 +24,7 @@ class AccountDetailPageState extends State<AccountDetailPage> with AccountsContr
   Widget build(BuildContext context) {
     return ScaffoldPage(
       key: pageKey,
+      padding: const EdgeInsets.all(0),
       header: buildPageScaffoldHeader(context, widget.account.label),
       content: _buildContent(context),
     );

@@ -25,6 +25,7 @@ class DbLoginPage extends StatelessWidget with DbLoginController {
     );
 
     return ScaffoldPage(
+      padding: const EdgeInsets.all(0),
       content: _buildScaffold(context, checkPwdWidget),
     );
   }

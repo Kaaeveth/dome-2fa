@@ -21,6 +21,7 @@ class AccountsPageState extends State<AccountsPage> with AccountsController {
   Widget build(BuildContext context) {
     return ScaffoldPage(
       key: pageKey,
+      padding: const EdgeInsets.all(0),
       header: _buildHeader(context),
       content: ChangeNotifierProvider(
         create: (context) => Provider.of<AccountsService>(context, listen: false).accountDb!,

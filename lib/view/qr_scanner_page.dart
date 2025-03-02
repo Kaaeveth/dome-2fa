@@ -26,20 +26,18 @@ class QrScannerPageState extends State<QrScannerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldPage(
-      content: Center(
-        child: Stack(
-          fit: StackFit.expand,
-          clipBehavior: Clip.none,
-          children: [
-            MobileScanner(
-              onDetect: _onDetect,
-              controller: scannerController,
-              fit: BoxFit.cover,
-            )
-          ],
-        ),
-      )
+    return Center(
+      child: Stack(
+        fit: StackFit.expand,
+        clipBehavior: Clip.none,
+        children: [
+          MobileScanner(
+            onDetect: _onDetect,
+            controller: scannerController,
+            fit: BoxFit.cover,
+          )
+        ],
+      ),
     );
   }
 

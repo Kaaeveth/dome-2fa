@@ -10,6 +10,7 @@ class AddAccountFormPage extends StatelessWidget with AddAccountController {
     var headingStyle = FluentTheme.of(context).typography.title;
     return ScaffoldPage(
       key: pageKey,
+      padding: const EdgeInsets.all(0),
       content: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Column(
