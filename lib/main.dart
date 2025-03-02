@@ -72,7 +72,7 @@ class AppState extends State<App> {
       builder: (context, child) => AnnotatedRegion(
         value: SystemUiOverlayStyle(
           statusBarColor: FluentTheme.of(context).scaffoldBackgroundColor,
-          statusBarIconBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.light,
         ),
         child: SafeArea(child: child!)
       ),
