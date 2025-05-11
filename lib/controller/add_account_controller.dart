@@ -39,10 +39,14 @@ mixin AddAccountController {
   }
 
   String? validateDuration(String? val) {
-    if(val == null || val.isEmpty || val == "null" || int.parse(val) < 1) {
-      return "Duration must be greater than 1";
+    if (val == null && duration > 0) return null;
+    if (val != null && val.isNotEmpty) {
+      var duration = int.tryParse(val);
+      if (duration != null && duration > 0) {
+        return null;
+      }
     }
-    return null;
+    return "Duration must be greater than 1";
   }
 
   String? validateIssuer(String? val) {

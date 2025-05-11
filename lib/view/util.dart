@@ -14,8 +14,13 @@ void Function() showLoadingIndicator(BuildContext context) {
   );
 
   return () {
-    if(dialogCtx != null && dialogCtx!.mounted) {
+    // If the dialog is being dismissed before even being shown,
+    // the dialog context will be null but their will be still
+    // a new entry in the widget tree which we need to pop.
+    if(dialogCtx?.mounted ?? false) {
       Navigator.of(dialogCtx!).pop();
+    } else {
+      Navigator.of(context).pop();
     }
   };
 }

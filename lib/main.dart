@@ -47,6 +47,7 @@ class AppState extends State<App> {
   }
 
   void _onAccountsDbChange() {
+    if(navigatorKey.currentState == null) return;
     final accountModel = Provider.of<AccountsService>(context, listen: false);
     FluentPageRoute page;
     if(accountModel.accountDb != null) {
@@ -72,9 +73,14 @@ class AppState extends State<App> {
       builder: (context, child) => AnnotatedRegion(
         value: SystemUiOverlayStyle(
           statusBarColor: FluentTheme.of(context).scaffoldBackgroundColor,
-          statusBarIconBrightness: Brightness.light,
+          statusBarIconBrightness: Brightness.dark
         ),
-        child: SafeArea(child: child!)
+        // For whatever reason, setting the status bar color above
+        // has no effect. We color the safe area directly because of that.
+        child: Container(
+          color: FluentTheme.of(context).scaffoldBackgroundColor,
+          child: SafeArea(child: child!),
+        )
       ),
     );
   }

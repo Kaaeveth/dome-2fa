@@ -67,7 +67,7 @@ class AddAccountFormPage extends StatelessWidget with AddAccountController {
                   value: duration,
                   mode: SpinButtonPlacementMode.inline,
                   validator: validateDuration,
-                  onChanged: (v) => duration = v!,
+                  onChanged: (v) => duration = v ?? 1,
                 ))
               ],
             ),
