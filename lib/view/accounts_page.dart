@@ -1,6 +1,7 @@
 import 'package:dome_2fa/controller/accounts_controller.dart';
 import 'package:dome_2fa/core/util.dart';
 import 'package:dome_2fa/model/accounts_service.dart';
+import 'package:dome_2fa/model/search_accounts_service.dart';
 import 'package:dome_2fa/view/account_detail_page.dart';
 import 'package:dome_2fa/core/account/account.dart';
 import 'package:dome_2fa/view/token.dart';
@@ -16,6 +17,7 @@ class AccountsPage extends StatefulWidget {
 class AccountsPageState extends State<AccountsPage> with AccountsController {
 
   final FlyoutController _menuController = FlyoutController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -24,22 +26,27 @@ class AccountsPageState extends State<AccountsPage> with AccountsController {
       padding: const EdgeInsets.all(0),
       header: _buildHeader(context),
       content: ChangeNotifierProvider(
-        create: (context) => Provider.of<AccountsService>(context, listen: false).accountDb!,
+        create: (context) {
+          var accDb = Provider.of<AccountsService>(context, listen: false).accountDb!;
+          var searchService = SearchAccountsService(accDb);
+          _searchController.addListener(() => searchService.updateSearch(_searchController.text));
+          return searchService;
+        },
         builder: (context, child) => _buildAccountList(context, child)
       )
     );
   }
 
   Widget _buildAccountList(BuildContext context, Widget? child) {
-    return Consumer<AccountDb>(
-        builder: (context, accountDb, child) =>
+    return Consumer<SearchAccountsService>(
+        builder: (context, accountSearch, child) =>
           Card(
             margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
             child: ListView.separated(
-              itemCount: accountDb.accounts.length,
+              itemCount: accountSearch.matchingAccounts.length,
               itemBuilder: (context, index) {
-                final acc = accountDb[index];
+                final acc = accountSearch.matchingAccounts.elementAt(index);
                 return ListTile.selectable(
                   title: Text(acc.issuer, overflow: TextOverflow.ellipsis),
                   subtitle: Text(acc.label, overflow: TextOverflow.ellipsis),
@@ -67,7 +74,7 @@ class AccountsPageState extends State<AccountsPage> with AccountsController {
         spacing: 8,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Flexible(child: TextBox(placeholder: "Search...")),
+          Flexible(child: TextBox(placeholder: "Search...", controller: _searchController)),
           FlyoutTarget(
             controller: _menuController,
             child: Button(
@@ -130,6 +137,7 @@ class AccountsPageState extends State<AccountsPage> with AccountsController {
   @override
   void dispose() {
     _menuController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 }

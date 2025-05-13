@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:dome_2fa/core/account/account.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -78,6 +79,8 @@ class TokenWithLifetimeState extends State<TokenWithLifetime> {
     _tokenLifetime = acc.getRemainingTime();
   }
 
+  double get _percentTokenLifetime => clampDouble(_tokenLifetime / widget.account.duration * 100, 0.0, 100.0);
+
   @override
   Widget build(BuildContext context) {
     return widget.barBelow ? _buildWithBottomBar(context) : _buildDefault(context);
@@ -88,7 +91,7 @@ class TokenWithLifetimeState extends State<TokenWithLifetime> {
       spacing: 8,
       children: [
         Token(token: _token, fontSize: widget.fontSize),
-        ProgressRing(value: (_tokenLifetime / widget.account.duration * 100)),
+        ProgressRing(value: _percentTokenLifetime),
       ],
     );
   }
@@ -99,7 +102,7 @@ class TokenWithLifetimeState extends State<TokenWithLifetime> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Token(token: _token, fontSize: widget.fontSize),
-        ProgressBar(value: (_tokenLifetime / widget.account.duration * 100), strokeWidth: 8)
+        ProgressBar(value: _percentTokenLifetime, strokeWidth: 8)
       ],
     );
   }
