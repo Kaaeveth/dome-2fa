@@ -50,7 +50,7 @@ class TokenWithLifetime extends StatefulWidget {
 
 class TokenWithLifetimeState extends State<TokenWithLifetime> {
 
-  int _tokenLifetime = 30;
+  final ValueNotifier<int> _tokenLifetime = ValueNotifier(30);
   String _token = "";
   Timer? _timer;
 
@@ -58,11 +58,9 @@ class TokenWithLifetimeState extends State<TokenWithLifetime> {
   void initState() {
     setState(_updateToken);
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() {
-        if(--_tokenLifetime < 1) {
-          _updateToken();
-        }
-      });
+      if(--_tokenLifetime.value < 1) {
+        setState(_updateToken);
+      }
     });
     super.initState();
   }
@@ -76,10 +74,10 @@ class TokenWithLifetimeState extends State<TokenWithLifetime> {
   void _updateToken() {
     final acc = widget.account;
     _token = acc.generateToken();
-    _tokenLifetime = acc.getRemainingTime();
+    _tokenLifetime.value = acc.getRemainingTime();
   }
 
-  double get _percentTokenLifetime => clampDouble(_tokenLifetime / widget.account.duration * 100, 0.0, 100.0);
+  double get _percentTokenLifetime => clampDouble(_tokenLifetime.value / widget.account.duration * 100, 0.0, 100.0);
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +89,10 @@ class TokenWithLifetimeState extends State<TokenWithLifetime> {
       spacing: 8,
       children: [
         Token(token: _token, fontSize: widget.fontSize),
-        ProgressRing(value: _percentTokenLifetime),
+        ListenableBuilder(
+            listenable: _tokenLifetime,
+            builder: (context, child) => ProgressRing(value: _percentTokenLifetime)
+        ),
       ],
     );
   }
@@ -102,7 +103,10 @@ class TokenWithLifetimeState extends State<TokenWithLifetime> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Token(token: _token, fontSize: widget.fontSize),
-        ProgressBar(value: _percentTokenLifetime, strokeWidth: 8)
+        ListenableBuilder(
+            listenable: _tokenLifetime,
+            builder: (context, child) => ProgressBar(value: _percentTokenLifetime, strokeWidth: 8)
+        )
       ],
     );
   }
