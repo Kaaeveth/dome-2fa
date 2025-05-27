@@ -19,6 +19,8 @@ class AccountDetailPageState extends State<AccountDetailPage> with AccountsContr
   var deleteBtnStyle = ButtonStyle(
       backgroundColor: WidgetStatePropertyAll(Colors.red)
   );
+  final ValueNotifier displaySecret = ValueNotifier(false);
+  final TextEditingController secretCtrl = TextEditingController(text: "Tap to show");
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +105,28 @@ class AccountDetailPageState extends State<AccountDetailPage> with AccountsContr
           InfoLabel(
             label: "Label",
             child: TextBox(readOnly: true, controller: TextEditingController(text: widget.account.label)),
+          ),
+          InfoLabel(
+            label: "Secret",
+            child: GestureDetector(
+                onTap: () => displaySecret.value = !displaySecret.value,
+                child: ListenableBuilder(
+                  listenable: displaySecret,
+                  child: TextBox(
+                    readOnly: true,
+                    controller: secretCtrl,
+                    onTap: () => displaySecret.value = !displaySecret.value,
+                  ),
+                  builder: (context, child) {
+                    if(displaySecret.value) {
+                      secretCtrl.text = widget.account.secret;
+                    } else {
+                      secretCtrl.text = "Tap to show";
+                    }
+                    return child!;
+                  },
+                )
+            )
           )
         ],
       )
