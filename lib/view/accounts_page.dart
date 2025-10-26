@@ -38,23 +38,34 @@ class AccountsPageState extends State<AccountsPage> with AccountsController {
   }
 
   Widget _buildAccountList(BuildContext context, Widget? child) {
-    return Consumer<SearchAccountsService>(
-        builder: (context, accountSearch, child) =>
+    return Consumer2<SearchAccountsService, AccountsService>(
+        builder: (context, accountSearch, accountsService, child) =>
           Card(
             margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-            child: ListView.separated(
+            child: ReorderableListView.builder(
               itemCount: accountSearch.matchingAccounts.length,
+              buildDefaultDragHandles: false,
               itemBuilder: (context, index) {
                 final acc = accountSearch.matchingAccounts.elementAt(index);
-                return ListTile.selectable(
-                  title: Text(acc.issuer, overflow: TextOverflow.ellipsis),
-                  subtitle: Text(acc.label, overflow: TextOverflow.ellipsis),
-                  trailing: TokenWithLifetime(account: acc),
-                  onPressed: () => openAccountDetails(acc),
+                return ReorderableDragStartListener(
+                    index: index,
+                    key: ValueKey(index),
+                    child: ListTile.selectable(
+                      title: Text(acc.issuer, overflow: TextOverflow.ellipsis),
+                      subtitle: Text(acc.label, overflow: TextOverflow.ellipsis),
+                      trailing: TokenWithLifetime(account: acc),
+                      onPressed: () => openAccountDetails(acc),
+                    )
                 );
               },
-              separatorBuilder: (context, index) => const Divider(),
+              onReorder: (oldIdx, newIdx) async {
+                if (oldIdx < newIdx) {
+                  --newIdx;
+                }
+                await accountsService.accountDb?.changeAccountOrder(oldIdx, newIdx);
+              },
+              //separatorBuilder: (context, index) => const Divider(),
             ),
           )
     );

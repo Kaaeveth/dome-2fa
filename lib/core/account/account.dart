@@ -110,14 +110,42 @@ abstract class AccountDb extends ChangeNotifier {
   Future<void> insert(Account acc);
   Future<void> delete(Account acc);
   Future<void> update(Account acc);
+  Future<void> save();
 
   Iterable<Account> get accounts;
   Account operator[](int idx);
+  operator[]=(int idx, Account acc);
+  int get count;
 
   bool exists(Account acc) {
     return accounts.any((a) => a == acc);
   }
 
+  /// Moves the account at [idx1] to [idx2], moving other accounts in-between up or down.
+  /// If either index is out of bounds, then this method does nothing.
+  Future<void> changeAccountOrder(int idx1, int idx2) async {
+    if(idx1 < 0 || idx1 >= count || idx2 < 0 || idx2 >= count || idx2 == idx1) return;
+
+    var acc = this[idx1];
+    if(idx1 < idx2) {
+      // Up -> Down
+      for(;idx1 < idx2; ++idx1) {
+        this[idx1] = this[idx1+1];
+      }
+    } else {
+      // Down -> Up
+      for(;idx1 > idx2; --idx1) {
+        this[idx1] = this[idx1-1];
+      }
+    }
+    this[idx2] = acc;
+
+    await save();
+    notifyListeners();
+  }
+
+  /// Closes the DB. The object is in a disposed state
+  /// and any method may fail afterwards.
   void close();
   bool get isClosed;
 
