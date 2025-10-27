@@ -50,7 +50,7 @@ class AccountsPageState extends State<AccountsPage> with AccountsController {
                 final acc = accountSearch.matchingAccounts.elementAt(index);
                 return ReorderableDragStartListener(
                     index: index,
-                    key: ValueKey(index),
+                    key: ValueKey(acc),
                     child: ListTile.selectable(
                       title: Text(acc.issuer, overflow: TextOverflow.ellipsis),
                       subtitle: Text(acc.label, overflow: TextOverflow.ellipsis),
