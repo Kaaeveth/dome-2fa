@@ -9,6 +9,7 @@ import 'package:logging/logging.dart';
 
 final logger = Logger("JsonAccountDb");
 
+/// An Account database backed by an encrypted Json file.
 class JsonAccountDb extends AccountDb {
 
   final List<Account> _accounts;
@@ -17,6 +18,8 @@ class JsonAccountDb extends AccountDb {
 
   JsonAccountDb._internal(this._accounts, this._cryptoFile);
 
+  /// Opens the DB using either the [password] or the encryption [key] used to
+  /// encrypt and decrypt the DB.
   static Future<JsonAccountDb> open(File dbFile, {String? password, String? key}) async {
     var crypto = await CryptoFile.createOrOpen(
       dbFile,
@@ -41,7 +44,7 @@ class JsonAccountDb extends AccountDb {
       List<Account>.empty(growable: true),
       await CryptoFile.createOrOpen(dbFile, password: password)
     );
-    await db._writeAccounts();
+    await db.save();
     return db;
   }
 
@@ -55,9 +58,18 @@ class JsonAccountDb extends AccountDb {
       "issuer": acc.issuer,
       "duration": acc.duration
     };
-  } 
+  }
 
-  Future<void> _writeAccounts() async {
+  @override
+  operator[]=(int idx, Account acc) {
+    _accounts[idx] = acc;
+  }
+
+  @override
+  int get count => _accounts.length;
+
+  @override
+  Future<void> save() async {
     if(_cryptoFile == null) {
       throw Exception("Cannot write account db: Crypto provider is null");
     }
@@ -95,7 +107,7 @@ class JsonAccountDb extends AccountDb {
   Future<void> delete(Account acc) async {
     _checkClosed();
     _accounts.remove(acc);
-    await _writeAccounts();
+    await save();
     logger.info("Deleted Account ${acc.label}");
     notifyListeners();
   }
@@ -108,7 +120,7 @@ class JsonAccountDb extends AccountDb {
       return;
     }
     _accounts.add(acc);
-    await _writeAccounts();
+    await save();
     notifyListeners();
   }
 
@@ -124,7 +136,7 @@ class JsonAccountDb extends AccountDb {
       return;
     }
     _accounts[idx] = acc;
-    await _writeAccounts();
+    await save();
     notifyListeners();
   }
 }
